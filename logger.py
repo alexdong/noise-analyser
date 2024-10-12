@@ -2,7 +2,8 @@ import pyaudio
 import numpy as np
 import time
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
+import os
 
 # Function to measure noise level (decibels) using the microphone
 def get_noise_level():
@@ -27,23 +28,33 @@ def get_noise_level():
     return db
 
 
+def get_file_path():
+    base_path = "/Users/alexdong/Library/Mobile Documents/com~apple~CloudDocs/noise_data"
+    os.makedirs(base_path, exist_ok=True)
+    current_time = datetime.now()
+    if current_time.hour < 7:
+        current_time -= timedelta(days=1)
+    return os.path.join(base_path, f"{current_time.strftime('%Y-%m-%d')}.csv")
+
 # Function to log noise levels to CSV
-def log_noise_level(file_path='noise_data.csv', duration_minutes=60):
-    start_time = time.time()
-    end_time = start_time + duration_minutes * 60
+def log_noise_level():
+    while True:
+        file_path = get_file_path()
+        file_exists = os.path.exists(file_path)
+        
+        with open(file_path, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            if not file_exists:
+                writer.writerow(['Timestamp', 'Noise_Level_dB'])  # CSV headers
 
-    with open(file_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Timestamp', 'Noise_Level_dB'])  # CSV headers
+            while datetime.now().hour != 7 or datetime.now().minute != 0:
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                noise_level = get_noise_level()  # Use microphone input
+                print(f"{timestamp} - Noise Level: {noise_level:.2f} dB")
+                writer.writerow([timestamp, noise_level])
+                time.sleep(1)  # Log every second
 
-        while time.time() < end_time:
-            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            noise_level = get_noise_level()  # Use microphone input
-            print(f"{timestamp} - Noise Level: {noise_level:.2f} dB")
-            writer.writerow([timestamp, noise_level])
-            time.sleep(1)  # Log every second
+        print(f"Logging rotated. New data will be saved to {get_file_path()}")
 
-    print(f"Logging complete. Data saved to {file_path}")
-
-# Start logging noise levels for 8 hours (adjust as needed)
-log_noise_level(duration_minutes=8*60)
+# Start logging noise levels continuously
+log_noise_level()
