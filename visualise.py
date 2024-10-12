@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 # Function to visualize noise levels
 def visualize_noise_data(date=None):
-    base_path = "/Users/alexdong/Library/Mobile Documents/com~apple~CloudDocs/noise_data"
+    base_path = "/Users/alexdong/Library/Mobile Documents/com~apple~CloudDocs/Personal Data/noises_over_sleep"
     
     if date is None:
         date = datetime.now().strftime('%Y-%m-%d')

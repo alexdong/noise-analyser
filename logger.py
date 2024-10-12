@@ -29,7 +29,7 @@ def get_noise_level():
 
 
 def get_file_path():
-    base_path = "/Users/alexdong/Library/Mobile Documents/com~apple~CloudDocs/noise_data"
+    base_path = "/Users/alexdong/Library/Mobile Documents/com~apple~CloudDocs/Personal Data/noises_over_sleep"
     os.makedirs(base_path, exist_ok=True)
     current_time = datetime.now()
     if current_time.hour < 7:
